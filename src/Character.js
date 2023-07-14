@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const CharacterCard = styled.div`
@@ -8,6 +9,13 @@ const CharacterCard = styled.div`
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const CharacterImage = styled.img`
+  width: 200px; /* Ajusta el ancho según tus necesidades */
+  height: auto;
+  margin-bottom: 10px;
+  border-radius: 4px;
 `;
 
 const CharacterName = styled.p`
@@ -33,14 +41,41 @@ const DeleteButton = styled.button`
 `;
 
 const Character = ({ name, gender, hairColor, onDelete }) => {
+  const [image, setImage] = useState('');
+
+  useEffect(() => {
+    const fetchCharacterData = async () => {
+      try {
+        const response = await fetch(`https://swapi.dev/api/people/?search=${name}`);
+        const data = await response.json();
+        if (data.results.length > 0) {
+          const character = data.results[0];
+          setImage(`https://starwars-visualguide.com/assets/img/characters/${character.url.split('/')[5]}.jpg`);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCharacterData();
+  }, [name]);
+
   return (
     <CharacterCard>
+      <CharacterImage src={image} alt={name} />
       <CharacterName>{name}</CharacterName>
       <CharacterInfo>Género: {gender}</CharacterInfo>
       <CharacterInfo>Color de cabello: {hairColor}</CharacterInfo>
       <DeleteButton onClick={onDelete}>Eliminar</DeleteButton>
     </CharacterCard>
   );
+};
+
+Character.propTypes = {
+  name: PropTypes.string.isRequired,
+  gender: PropTypes.string.isRequired,
+  hairColor: PropTypes.string.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default Character;

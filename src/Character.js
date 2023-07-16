@@ -12,7 +12,7 @@ const CharacterCard = styled.div`
 `;
 
 const CharacterImage = styled.img`
-  width: 200px; /* Ajusta el ancho según tus necesidades */
+  width: 200px;
   height: auto;
   margin-bottom: 10px;
   border-radius: 4px;
@@ -38,6 +38,11 @@ const DeleteButton = styled.button`
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out; /* Agrega una transición suave */
+  
+  &:hover {
+    background-color: #e60000; /* Cambia el color al pasar el mouse */
+  }
 `;
 
 const Character = ({ name, gender, hairColor, onDelete }) => {

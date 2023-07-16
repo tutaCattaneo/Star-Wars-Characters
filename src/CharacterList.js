@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { FaSpinner } from 'react-icons/fa'; // Importa el ícono de carga
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Character from './Character';
+
 const Container = styled.div`
   background-color: #f2f2f2;
   padding: 20px;
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
-  min-height: 100vh; /* Asegura que el contenedor ocupe al menos el 100% de la altura de la pantalla */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 `;
 
 const CharacterListContainer = styled.div`
@@ -29,6 +32,7 @@ const LoadingText = styled.p`
 const CharacterList = () => {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     const fetchCharacters = async () => {
@@ -39,10 +43,19 @@ const CharacterList = () => {
       } catch (error) {
         console.error(error);
         setLoading(false);
+        toast.error('Hubo un error al cargar la lista de personajes.');
       }
     };
 
     fetchCharacters();
+  }, []);
+
+  useEffect(() => {
+    if (!isFirstRender.current) {
+      toast.success('¡Bienvenido a la lista de personajes de Star Wars!');
+    } else {
+      isFirstRender.current = false;
+    }
   }, []);
 
   const handleDelete = (url) => {
@@ -51,22 +64,25 @@ const CharacterList = () => {
 
   return (
     <Container>
+      <ToastContainer position="top-center" />
       {loading ? (
         <LoadingText>
-          <FaSpinner className="loading-icon" /> Cargando...
+          <FaSpinner className="loading-icon" /> Cargando lista...
         </LoadingText>
       ) : (
-        <CharacterListContainer>
-          {characters.map((character) => (
-            <Character
-              key={character.url}
-              name={character.name}
-              gender={character.gender}
-              hairColor={character.hair_color}
-              onDelete={() => handleDelete(character.url)}
-            />
-          ))}
-        </CharacterListContainer>
+        <>
+          <CharacterListContainer>
+            {characters.map((character) => (
+              <Character
+                key={character.url}
+                name={character.name}
+                gender={character.gender}
+                hairColor={character.hair_color}
+                onDelete={() => handleDelete(character.url)}
+              />
+            ))}
+          </CharacterListContainer>
+        </>
       )}
     </Container>
   );
